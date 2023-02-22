@@ -39,11 +39,11 @@ public class IntakeProp extends CommandBase {
   @Override
   public void execute() {
     if(stage == 0) {
-      if(intake.speedUp()) {
+      if(intake.speedUp()) { // waits for power to go up
         stage = 1;
         speedUp.stop();
       } else {
-        SmartDashboard.putNumber("Trying speedup", speedUp.get());
+        SmartDashboard.putNumber("Trying speedup", speedUp.get()); //keeps trying for set amount time, if it doesn't work, it stops
           if(speedUp.get() > IntakeConstants.kSpeedUpFailTime) {
             stage = -1;
             intake.stop();
@@ -53,15 +53,11 @@ public class IntakeProp extends CommandBase {
             intake.moveIn();
           }
       }
-    } else {
-      if(intake.objectHeld()) {
-        if(stage == 1) {
-          intake.stop();
-          finished = true;
-          stage = -1;
-        } else {
-          intake.moveIn();
-        }
+    } else { //starts checking for game pieces once its speed up
+      if(intake.objectHeld()) { // waits for spike when object is intaked
+        intake.stop();
+        finished = true;
+        stage = -1;
       } else {
         intake.moveIn();
       }

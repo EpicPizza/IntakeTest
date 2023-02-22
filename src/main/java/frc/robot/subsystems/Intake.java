@@ -68,10 +68,10 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Velocity", getActualVelocity());
+    /*SmartDashboard.putNumber("Velocity", getActualVelocity());
     SmartDashboard.putNumber("Speed", intakeSpeed);
     SmartDashboard.putBoolean("Object Held", objectHeld());
     SmartDashboard.putNumber("Current", intake.getStatorCurrent());
-    System.out.println("Current: " + intake.getStatorCurrent());
+    System.out.println("Current: " + intake.getStatorCurrent());*/
   }
 }

@@ -39,18 +39,18 @@ public class OuttakeProp extends CommandBase {
   @Override
   public void execute() {
     if(stage == 0) {
-      if(!intake.objectOut()) {
+      if(!intake.objectOut()) { //waits for the spike when the piece is still stuck
         stage = 1;
       } else {
         intake.moveOut();
       }
     } else {
-      if(intake.objectOut()) {
+      if(intake.objectOut()) { // now it waits for spike to lower, i.e. object out 
         stage = -1;
         intake.stop();
         outFail.stop();
         finished = true;
-      } else {
+      } else { //sometimes it fails when the cone is stuck, this to prevent damage to the motors
         SmartDashboard.putNumber("Trying outtake", outFail.get());
         if(outFail.get() > IntakeConstants.kOutFailTime) {
           stage = -1;

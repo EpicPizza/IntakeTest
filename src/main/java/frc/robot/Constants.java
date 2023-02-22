@@ -20,9 +20,9 @@ public final class Constants {
   public static class IntakeConstants {
     public static final int kIntakePort = 22;
     public static double kMaxIntakeSpeed = 0.2;
-    public static double kSpeedUpFailTime = 0.75;
-    public static double kOutFailTime = 0.75;
-    public static double kObjectHeldThreshold = 300; //proportional to max intake speed
+    public static double kSpeedUpFailTime = 0.75; //seconds it tries to speed up
+    public static double kOutFailTime = 0.75; //seconds it tries to outtake
+    public static double kObjectHeldThreshold = 300; //proportional to max intake speed, current values found at 0.3
     public static double kSpeedUpThreshold = 100;
     public static double kObjectOutThreshold = 166;
   }
