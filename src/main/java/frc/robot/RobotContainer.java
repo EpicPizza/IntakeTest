@@ -6,8 +6,8 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
-import frc.robot.commands.IntakeProp;
-import frc.robot.commands.OuttakeProp;
+import frc.robot.commands.IntakePiece;
+import frc.robot.commands.OuttakePiece;
 import frc.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -46,8 +46,8 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    controller.a().onTrue(new IntakeProp(intake));
-    controller.b().onTrue(new OuttakeProp(intake));
+    controller.a().onTrue(new IntakePiece(intake));
+    controller.b().onTrue(new OuttakePiece(intake));
     
   }
 
