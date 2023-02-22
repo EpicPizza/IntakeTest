@@ -4,13 +4,18 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.Intake;
 
 public class IntakeProp extends CommandBase {
   private final Intake intake;
 
   private boolean finished = false;
+
+  private Timer speedUp = new Timer();
 
   private int stage;
   /** Creates a new IntakeMotor. */
@@ -24,7 +29,10 @@ public class IntakeProp extends CommandBase {
   @Override
   public void initialize() {
     stage = 0;
+    finished = false;
     intake.moveIn();
+    speedUp.reset();
+    speedUp.start();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -33,18 +41,32 @@ public class IntakeProp extends CommandBase {
     if(stage == 0) {
       if(intake.speedUp()) {
         stage = 1;
+        speedUp.stop();
       } else {
-        intake.moveIn();
+        SmartDashboard.putNumber("Trying speedup", speedUp.get());
+          if(speedUp.get() > IntakeConstants.kSpeedUpFailTime) {
+            stage = -1;
+            intake.stop();
+            speedUp.stop();
+            finished = true;
+          } else {
+            intake.moveIn();
+          }
       }
     } else {
       if(intake.objectHeld()) {
-        stage = -1;
-        intake.stop();
-        finished = true;
+        if(stage == 1) {
+          intake.stop();
+          finished = true;
+          stage = -1;
+        } else {
+          intake.moveIn();
+        }
       } else {
         intake.moveIn();
       }
     }
+    SmartDashboard.putNumber("Intake Step", stage);
   }
 
   // Called once the command ends or is interrupted.

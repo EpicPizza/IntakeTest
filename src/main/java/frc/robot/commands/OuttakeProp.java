@@ -4,13 +4,20 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.Intake;
 
 public class OuttakeProp extends CommandBase {
   private final Intake intake;
 
+  private int stage = 0;
+
   private boolean finished = false;
+
+  private Timer outFail = new Timer();
   /** Creates a new IntakeMotor. */
   public OuttakeProp(Intake rIntake) {
     intake = rIntake;
@@ -22,17 +29,40 @@ public class OuttakeProp extends CommandBase {
   @Override
   public void initialize() {
     intake.moveOut();
+    finished = false;
+    stage = 0;
+    outFail.reset();
+    outFail.start();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(intake.objectOut()) {
-      intake.stop();
-      finished = true;
+    if(stage == 0) {
+      if(!intake.objectOut()) {
+        stage = 1;
+      } else {
+        intake.moveOut();
+      }
     } else {
-      intake.moveOut();
+      if(intake.objectOut()) {
+        stage = -1;
+        intake.stop();
+        outFail.stop();
+        finished = true;
+      } else {
+        SmartDashboard.putNumber("Trying outtake", outFail.get());
+        if(outFail.get() > IntakeConstants.kOutFailTime) {
+          stage = -1;
+          intake.stop();
+          outFail.stop();
+          finished = true;
+        } else {
+          intake.moveOut();
+        }
+      }
     }
+    SmartDashboard.putNumber("Outtake Step", stage);
   }
 
   // Called once the command ends or is interrupted.

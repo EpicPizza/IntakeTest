@@ -7,12 +7,14 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 
 public class Intake extends SubsystemBase {
 
-  private final WPI_TalonFX intake = new WPI_TalonFX(IntakeConstants.kIntakePort);
+  private final WPI_TalonFX intake = new WPI_TalonFX(IntakeConstants.kIntakePort, "CANivore");
+  private double intakeSpeed = 0;
 
   public Intake() {
     intake.configFactoryDefault();
@@ -22,22 +24,30 @@ public class Intake extends SubsystemBase {
 
   public void setSpeed(double speed) {
     intake.set(speed);
+    intakeSpeed = speed;
   }
 
   public void moveIn() {
     setSpeed(IntakeConstants.kMaxIntakeSpeed);
+    intakeSpeed = IntakeConstants.kMaxIntakeSpeed;
   }
 
   public void moveOut() {
-    setSpeed(-IntakeConstants.kMaxIntakeSpeed); 
+    setSpeed(-IntakeConstants.kMaxIntakeSpeed);
+    intakeSpeed = -IntakeConstants.kMaxIntakeSpeed; 
   }
 
   public void stop() {
     setSpeed(0.000);
+    intakeSpeed = 0;
   }
 
   public double getActualVelocity() {
     return intake.getSelectedSensorVelocity();
+  }
+
+  public double getActualCurrent() {
+    return intake.getStatorCurrent();
   }
 
   public boolean objectHeld() {
@@ -45,18 +55,23 @@ public class Intake extends SubsystemBase {
     // double actual = getActualVelocity();
     // double ratio = Math.abs(expected/actual);
     // return ratio > IntakeConstants.kObjectHeldRatioThreshold;
-    return getActualVelocity() > IntakeConstants.kLowThreshold;
+    return getActualCurrent() > IntakeConstants.kObjectHeldThreshold * IntakeConstants.kMaxIntakeSpeed;
   }
 
   public boolean speedUp() {
-    return getActualVelocity() > IntakeConstants.kHighThreshold;
+    return getActualCurrent() > IntakeConstants.kSpeedUpThreshold * IntakeConstants.kMaxIntakeSpeed;
   }
 
   public boolean objectOut() {
-    return getActualVelocity() < -IntakeConstants.kHighThreshold;
+    return getActualCurrent() < IntakeConstants.kObjectOutThreshold * IntakeConstants.kMaxIntakeSpeed;
   }
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Velocity", getActualVelocity());
+    SmartDashboard.putNumber("Speed", intakeSpeed);
+    SmartDashboard.putBoolean("Object Held", objectHeld());
+    SmartDashboard.putNumber("Current", intake.getStatorCurrent());
+    System.out.println("Current: " + intake.getStatorCurrent());
   }
 }
