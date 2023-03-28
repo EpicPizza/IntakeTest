@@ -4,10 +4,8 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants.IntakeConstants;
+import frc.robot.Dashboard;
 import frc.robot.subsystems.Intake;
 
 public class IntakePiece extends CommandBase {
@@ -15,11 +13,12 @@ public class IntakePiece extends CommandBase {
 
   private boolean finished = false;
 
-  private Timer speedUp = new Timer();
-
   private int stage;
+
+  //private CommandXboxController controller;
   /** Creates a new IntakeMotor. */
   public IntakePiece(Intake rIntake) {
+    //controller = Controller;
     intake = rIntake;
     addRequirements(rIntake);
     // Use addRequirements() here to declare subsystem dependencies.
@@ -31,30 +30,18 @@ public class IntakePiece extends CommandBase {
     stage = 0;
     finished = false;
     intake.moveIn();
-    speedUp.reset();
-    speedUp.start();
+    intake.stop = false;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
     if(stage == 0) {
-      if(intake.speedUp()) { // waits for power to go up
+      if(intake.intakeEmpty()) { // waits for power to go up
         stage = 1;
-        speedUp.stop();
-      } else {
-        SmartDashboard.putNumber("Trying speedup", speedUp.get()); //keeps trying for set amount time, if it doesn't work, it stops
-          if(speedUp.get() > IntakeConstants.kSpeedUpFailTime) {
-            stage = -1;
-            intake.stop();
-            speedUp.stop();
-            finished = true;
-          } else {
-            intake.moveIn();
-          }
       }
     } else { //starts checking for game pieces once its speed up
-      if(intake.objectHeld()) { // waits for spike when object is intaked
+      if(intake.pieceHeld()) { // waits for spike when object is intaked
         intake.stop();
         finished = true;
         stage = -1;
@@ -62,18 +49,18 @@ public class IntakePiece extends CommandBase {
         intake.moveIn();
       }
     }
-    SmartDashboard.putNumber("Intake Step", stage);
+    Dashboard.Intake.Debugging.putNumber("Intake Step", stage);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.stop();
+    intake.holdObject();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return finished;
+    return finished || intake.stop;
   }
 }

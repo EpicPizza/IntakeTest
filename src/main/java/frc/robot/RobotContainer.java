@@ -4,10 +4,12 @@
 
 package frc.robot;
 
-import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.DashbaordConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.IntakePiece;
+import frc.robot.commands.JoystickArm;
 import frc.robot.commands.OuttakePiece;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -29,11 +31,33 @@ public class RobotContainer {
 
   private final Intake intake = new Intake();
 
+  private final Arm arm = new Arm();
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+
+    arm.setDefaultCommand(new JoystickArm(arm, controller));
   }
+
+  private void startDashboard() {
+    Dashboard.Swerve.Debugging.set(DashbaordConstants.SwerveDebugging);
+    Dashboard.Swerve.Driver.set(DashbaordConstants.SwerveDriver);
+    Dashboard.Elevator.Debugging.set(DashbaordConstants.ElevatorDebugging);
+    Dashboard.Elevator.Driver.set(DashbaordConstants.ElevatorDriver);
+    Dashboard.Intake.Debugging.set(DashbaordConstants.IntakeDebugging);
+    Dashboard.Intake.Driver.set(DashbaordConstants.IntakeDriver);
+    Dashboard.Auto.Debugging.set(DashbaordConstants.AutoDebugging);
+    Dashboard.Auto.Driver.set(DashbaordConstants.AutoDriver);
+    Dashboard.Tele.Debugging.set(DashbaordConstants.TeleDebugging);
+    Dashboard.Tele.Driver.set(DashbaordConstants.TeleDriver);
+    Dashboard.Limelight.Driver.set(DashbaordConstants.LimelightDebugging);
+    Dashboard.Limelight.Driver.set(DashbaordConstants.LimelightDriver);
+    Dashboard.Arm.Driver.set(DashbaordConstants.ArmDebugging);
+    Dashboard.Arm.Driver.set(DashbaordConstants.ArmDriver);
+  }
+
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
@@ -46,8 +70,9 @@ public class RobotContainer {
    */
   private void configureBindings() {
     // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    controller.a().onTrue(new IntakePiece(intake));
-    controller.b().onTrue(new OuttakePiece(intake));
+    controller.a().onTrue(Commands.runOnce(() -> intake.moveOut(), intake));
+    controller.b().onTrue(Commands.runOnce(() -> intake.moveIn(), intake));
+    controller.x().onTrue(Commands.runOnce(() -> intake.stop(), intake));
     
   }
 
